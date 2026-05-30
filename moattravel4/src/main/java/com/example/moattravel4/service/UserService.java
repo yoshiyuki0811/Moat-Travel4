@@ -66,5 +66,14 @@ public class UserService {
 		
 		return password.equals(passwordConfirmation);
 	}
+	
+	//ユーザーを有効にする
+	@Transactional
+	public void enableUser(User user) {
+		
+		user.setEnabled(true);
+		
+		userRepository.save(user);
+	}
 
 }
