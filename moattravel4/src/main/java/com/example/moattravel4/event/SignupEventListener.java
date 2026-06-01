@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class signupEventListener {
+public class SignupEventListener {
 
 	private final VerificationTokenService verificationTokenService;
 	
