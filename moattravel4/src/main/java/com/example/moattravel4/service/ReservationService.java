@@ -80,5 +80,4 @@ public class ReservationService {
 		
 		return amount;
 	}
-
 }
