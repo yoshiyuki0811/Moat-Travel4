@@ -93,3 +93,22 @@ CREATE TABLE IF NOT EXISTS reservations (
      FOREIGN KEY (house_id) REFERENCES houses (id),
      FOREIGN KEY (user_id) REFERENCES users (id)
 );
+
+
+CREATE TABLE IF NOT EXISTS coupons (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) NOT NULL UNIQUE,      -- ユーザーが入力するコード（例: 'WELCOME10'）
+    name VARCHAR(100) NOT NULL,            -- クーポン名（例: '初回登録限定10%OFF'）
+    discount_rate INT NOT NULL,            -- 割引率（例: 10）
+    is_active BOOLEAN DEFAULT TRUE NOT NULL, -- 有効フラグ（trueで利用可能）
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS used_coupons (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,               -- 誰が
+    coupon_id BIGINT NOT NULL,             -- どのクーポンを
+    used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- ★同じ人が同じクーポンを2回使えないように複合ユニーク制約をかける
+    UNIQUE KEY unique_user_coupon (user_id, coupon_id)
+);

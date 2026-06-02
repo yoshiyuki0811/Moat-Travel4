@@ -1,4 +1,4 @@
--- housesテーブル
+-- housesテーブ
 INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, postal_code, address, phone_number) VALUES (1, 'SAMURAIの宿', 'house01.jpg', '最寄り駅から徒歩10分。自然豊かで閑静な場所にあります。長期滞在も可能です。', 6000, 2, '073-0145', '北海道砂川市西五条南X-XX-XX', '012-345-678');
 INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, postal_code, address, phone_number) VALUES (2, 'ペンション SAMURAI', 'house02.jpg', '最寄り駅から徒歩10分。自然豊かで閑静な場所にあります。長期滞在も可能です。', 7000, 3, '030-0945', '青森県青森市桜川X-XX-XX', '012-345-678');
 INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, postal_code, address, phone_number) VALUES (3, 'SAMURAI荘', 'house03.jpg', '最寄り駅から徒歩10分。自然豊かで閑静な場所にあります。長期滞在も可能です。', 8000, 4, '029-5618', '岩手県和賀郡西和賀町沢内両沢X-XX-XX', '012-345-678');
@@ -36,6 +36,9 @@ INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, p
 INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, postal_code, address, phone_number) VALUES (35, 'さむらいの宿', 'house05.jpg', '最寄り駅から徒歩10分。自然豊かで閑静な場所にあります。長期滞在も可能です。', 10000, 6, '750-0451', '山口県下関市豊田町阿座上X-XX-XX', '012-345-678');
 INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, postal_code, address, phone_number) VALUES (36, 'ペンション さむらい', 'house06.jpg', '最寄り駅から徒歩10分。自然豊かで閑静な場所にあります。長期滞在も可能です。', 6000, 2, '778-0004', '徳島県三好市池田町X-XX-XX', '012-345-678');
 INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, postal_code, address, phone_number) VALUES (37, 'さむらい荘', 'house07.jpg', '最寄り駅から徒歩10分。自然豊かで閑静な場所にあります。長期滞在も可能です。', 7000, 3, '762-0067', '香川県坂出市瀬居町X-XX-XX', '012-345-678');
+
+
+
 INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, postal_code, address, phone_number) VALUES (38, 'ゲストハウス さむらい', 'house08.jpg', '最寄り駅から徒歩10分。自然豊かで閑静な場所にあります。長期滞在も可能です。', 8000, 4, '792-0828', '愛媛県新居浜市松原町X-XX-XX', '012-345-678');
 INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, postal_code, address, phone_number) VALUES (39, 'さむらい屋', 'house09.jpg', '最寄り駅から徒歩10分。自然豊かで閑静な場所にあります。長期滞在も可能です。', 9000, 5, '787-1323', '高知県四万十市西土佐中半X-XX-XX', '012-345-678');
 INSERT IGNORE INTO houses (id, name, image_name, description, price, capacity, postal_code, address, phone_number) VALUES (40, '民宿 さむらい', 'house10.jpg', '最寄り駅から徒歩10分。自然豊かで閑静な場所にあります。長期滞在も可能です。', 10000, 6, '835-0018', '福岡県みやま市瀬高町高柳X-XX-XX', '012-345-678');
@@ -86,3 +89,5 @@ INSERT IGNORE INTO reservations (id, house_id, user_id, checkin_date, checkout_d
 INSERT IGNORE INTO reservations (id, house_id, user_id, checkin_date, checkout_date, number_of_people, amount) VALUES (9, 9, 1, '2023-04-01', '2023-04-02', 5, 9000);
 INSERT IGNORE INTO reservations (id, house_id, user_id, checkin_date, checkout_date, number_of_people, amount) VALUES (10, 10, 1, '2023-04-01', '2023-04-02', 6, 10000);
 INSERT IGNORE INTO reservations (id, house_id, user_id, checkin_date, checkout_date, number_of_people, amount) VALUES (11, 11, 1, '2023-04-01', '2023-04-02', 2, 6000);
+
+INSERT IGNORE INTO coupons (code, name, discount_rate, is_active) VALUES ('WELCOME10', '初回登録限定10%OFF', 10, TRUE);
