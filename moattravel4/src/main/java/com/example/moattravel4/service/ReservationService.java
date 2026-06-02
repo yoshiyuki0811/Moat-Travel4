@@ -2,13 +2,15 @@ package com.example.moattravel4.service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
+
+import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
 import com.example.moattravel4.Entity.House;
 import com.example.moattravel4.Entity.Reservation;
 import com.example.moattravel4.Entity.User;
-import com.example.moattravel4.form.ReservationRegisterForm;
 import com.example.moattravel4.repository.HouseRepository;
 import com.example.moattravel4.repository.ReservationRepository;
 import com.example.moattravel4.repository.UserRepository;
@@ -25,18 +27,26 @@ public class ReservationService {
 	
 	private final UserRepository userRepository;
 	
-	public void create(ReservationRegisterForm reservationRegisterForm) {
+	@Transactional
+	public void create(Map<String, String>paymentIntentObject) {
 		
 		Reservation reservation =new Reservation();
 		
-		House house =houseRepository.getReferenceById(reservationRegisterForm.getHouseId());
+		Integer houseId = Integer.valueOf(paymentIntentObject.get("houseId"));
 		
-		User user = userRepository.getReferenceById(reservationRegisterForm.getUserId());
+		Integer userId = Integer.valueOf(paymentIntentObject.get("userId"));
 		
-		LocalDate checkinDate = LocalDate.parse(reservationRegisterForm.getCheckinDate());
+		House house =houseRepository.getReferenceById(houseId);
 		
-		LocalDate checkoutDate = LocalDate.parse(reservationRegisterForm.getCheckoutDate());
+		User user = userRepository.getReferenceById(userId);
 		
+		LocalDate checkinDate = LocalDate.parse(paymentIntentObject.get("checkinDate"));
+		
+		LocalDate checkoutDate = LocalDate.parse(paymentIntentObject.get("checkoutDate"));
+		
+		Integer numberOfPeople = Integer.valueOf(paymentIntentObject.get("numberOfPeople"));
+		
+		Integer amount = Integer.valueOf(paymentIntentObject.get("amount")); 
 		
 		reservation.setHouse(house);
 		
@@ -46,9 +56,9 @@ public class ReservationService {
 		
 		reservation.setCheckoutDate(checkoutDate);
 		
-		reservation.setNumberOfPeople(reservationRegisterForm.getNumberOfPeople());
+		reservation.setNumberOfPeople(numberOfPeople);
 		
-		reservation.setAmount(reservationRegisterForm.getAmount());
+		reservation.setAmount(amount);
 		
 		reservationRepository.save(reservation);
 		
