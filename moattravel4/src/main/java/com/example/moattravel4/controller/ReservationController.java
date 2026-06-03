@@ -127,7 +127,7 @@ public class ReservationController {
 		
 		Coupon coupon = null;
 	    if (couponCode != null && !couponCode.isEmpty()) {
-	        coupon = couponService.virifyAndGetCoupon(couponCode, user);
+	        coupon = couponService.verifyAndGetCoupon(couponCode, user);
 	        
 	        if (coupon == null) {
 	            // クーポンが使えない場合（使用済みか無効）はじく

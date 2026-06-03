@@ -23,7 +23,7 @@ public class CouponService {
 	
 	
 	@Transactional
-	public Coupon virifyAndGetCoupon(String code, User user) {
+	public Coupon verifyAndGetCoupon(String code, User user) {
 		
 		//クーポンが有効でクーポンコードが一致するものを探す
 		Optional<Coupon> couponOpt = couponRepository.findByCodeAndIsActiveTrue(code);
