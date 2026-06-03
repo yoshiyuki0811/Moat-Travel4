@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.moattravel4.Entity.Role;
 import com.example.moattravel4.Entity.User;
+import com.example.moattravel4.event.UserEnabledEventPublisher;
 import com.example.moattravel4.form.SignupForm;
 import com.example.moattravel4.form.UserEditForm;
 import com.example.moattravel4.repository.RoleRepository;
@@ -23,6 +24,8 @@ public class UserService {
 	private final RoleRepository roleRepository;
 
 	private final PasswordEncoder passwordEncoder;
+	
+	private final UserEnabledEventPublisher userEnabledEventPublisher;
 
 	@Transactional
 	public User create(SignupForm signupForm) {
@@ -95,6 +98,8 @@ public class UserService {
 		user.setEnabled(true);
 
 		userRepository.save(user);
+		
+		userEnabledEventPublisher.publishUserEnabledEvent(user);
 	}
 	
 	//メールアドレスが変更されたかどうかチェックする
