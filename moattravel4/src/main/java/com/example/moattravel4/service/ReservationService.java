@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.moattravel4.Entity.Coupon;
 import com.example.moattravel4.Entity.House;
 import com.example.moattravel4.Entity.Reservation;
 import com.example.moattravel4.Entity.User;
@@ -79,5 +80,21 @@ public class ReservationService {
 		int amount = price * (int)numberOfNights;
 		
 		return amount;
+	}
+	
+	//クーポン使用時の料金計算
+	public Integer calculateAmount(LocalDate checkinDate, LocalDate checkoutDate, Integer price, Coupon coupon) {
+		
+		int baseAmount = calculateAmount(checkinDate, checkoutDate, price);
+		
+		if (coupon == null) {
+			return baseAmount;
+		}
+		
+		int discountedAmount = baseAmount * (100 - coupon.getDiscountRate()) / 100;
+		
+		return discountedAmount;
+		
+		
 	}
 }

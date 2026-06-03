@@ -17,8 +17,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.moattravel4.Entity.Coupon;
 import com.example.moattravel4.Entity.House;
 import com.example.moattravel4.Entity.Reservation;
 import com.example.moattravel4.Entity.User;
@@ -27,6 +29,7 @@ import com.example.moattravel4.form.ReservationRegisterForm;
 import com.example.moattravel4.repository.HouseRepository;
 import com.example.moattravel4.repository.ReservationRepository;
 import com.example.moattravel4.security.UserDetailsImpl;
+import com.example.moattravel4.service.CouponService;
 import com.example.moattravel4.service.ReservationService;
 import com.example.moattravel4.service.StripeService;
 
@@ -43,6 +46,8 @@ public class ReservationController {
 	private final ReservationService reservationService;
 	
 	private final StripeService stripeService;
+	
+	private final CouponService couponService;
 	
 	
 
@@ -103,6 +108,7 @@ public class ReservationController {
 	public String confirm(
 			@PathVariable(name = "id")Integer id, 
 			@ModelAttribute ReservationInputForm reservationInputForm, 
+			@RequestParam(name = "couponCode", required = false) String couponCode,
 			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
 			HttpServletRequest httpServletRequest,
 			Model model) {
@@ -119,7 +125,21 @@ public class ReservationController {
 		//宿泊料金を計算する
 		Integer price =house.getPrice();
 		
-		Integer amount =reservationService.calculateAmount(checkinDate, checkoutDate, price);
+		Coupon coupon = null;
+	    if (couponCode != null && !couponCode.isEmpty()) {
+	        coupon = couponService.virifyAndGetCoupon(couponCode, user);
+	        
+	        if (coupon == null) {
+	            // クーポンが使えない場合（使用済みか無効）はじく
+	            model.addAttribute("couponError", "無効なクーポンコードか、すでに使用されています。");
+	        } else {
+	            // クーポンが有効な場合は、画面に適用中と出すためにモデルに詰める
+	            model.addAttribute("appliedCoupon", coupon);
+	        }
+	    }
+		
+		
+		Integer amount =reservationService.calculateAmount(checkinDate, checkoutDate, price, coupon);
 		
 		ReservationRegisterForm reservationRegisterForm = new ReservationRegisterForm(
 				house.getId(), 
@@ -136,6 +156,8 @@ public class ReservationController {
 		model.addAttribute("reservationRegisterForm", reservationRegisterForm);
 		
 		 model.addAttribute("sessionId", sessionId);
+		 
+		 model.addAttribute("couponCode", couponCode);
 		
 		return "reservations/confirm";
 		

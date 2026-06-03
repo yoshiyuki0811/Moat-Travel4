@@ -7,6 +7,6 @@ import com.example.moattravel4.Entity.UsedCoupon;
 public interface UsedCouponRepository extends JpaRepository<UsedCoupon, Long> {
 	
 	// 指定したユーザーが、指定したクーポンをすでに使っているか確認する
-    boolean existsByUserIdAndCouponId(Long userId, Long couponId);
+    boolean existsByUserIdAndCouponId(Integer userId, Long couponId);
 
 }
