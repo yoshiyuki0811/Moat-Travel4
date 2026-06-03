@@ -38,139 +38,136 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 public class ReservationController {
-	
+
 	private final ReservationRepository reservationRepository;
-	
+
 	private final HouseRepository houseRepository;
-	
+
 	private final ReservationService reservationService;
-	
+
 	private final StripeService stripeService;
-	
+
 	private final CouponService couponService;
-	
-	
 
 	@GetMapping("/reservations")
 	public String index(
-			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, 
-			@PageableDefault(page = 0, size = 10, sort = "id",direction = Direction.ASC)Pageable pageable, 
+			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
+			@PageableDefault(page = 0, size = 10, sort = "id", direction = Direction.ASC) Pageable pageable,
 			Model model) {
-		
+
 		User user = userDetailsImpl.getUser();
-		
+
 		Page<Reservation> reservationPage = reservationRepository.findByUserOrderByCreatedAtDesc(user, pageable);
-		
+
 		model.addAttribute("reservationPage", reservationPage);
-		
+
 		return "reservations/index";
 	}
-	
+
 	@GetMapping("/houses/{id}/reservations/input")
 	public String input(
-			@PathVariable(name = "id")Integer id,
+			@PathVariable(name = "id") Integer id,
 			@ModelAttribute @Validated ReservationInputForm reservationInputForm,
 			BindingResult bindingResult,
 			RedirectAttributes redirectAttributes,
 			Model model) {
-		
+
 		House house = houseRepository.getReferenceById(id);
-		
+
 		Integer numberOfPeople = reservationInputForm.getNumberOfPeople();
-		
+
 		Integer capacity = house.getCapacity();
-		
-		if(numberOfPeople !=null) {
-			
-			if(!reservationService.isWithnCapacity(numberOfPeople, capacity)) {
-				
-				FieldError fieldError =new FieldError(bindingResult.getObjectName(), "numberOfPeople", "宿泊人数が定員を超えています。");
-				
+
+		if (numberOfPeople != null) {
+
+			if (!reservationService.isWithnCapacity(numberOfPeople, capacity)) {
+
+				FieldError fieldError = new FieldError(bindingResult.getObjectName(), "numberOfPeople",
+						"宿泊人数が定員を超えています。");
+
 				bindingResult.addError(fieldError);
 			}
-			}
-			
-			if(bindingResult.hasErrors()) {
-				
-				model.addAttribute("house", house);
-				
-				model.addAttribute("errorMessage", "予約内容に不備があります。");
-				
-				return "houses/show";
-			}
-			
-			redirectAttributes.addFlashAttribute("reservationInputForm", reservationInputForm);
-			
-			return "redirect:/houses/{id}/reservations/confirm";
 		}
-	
+
+		if (bindingResult.hasErrors()) {
+
+			model.addAttribute("house", house);
+
+			model.addAttribute("errorMessage", "予約内容に不備があります。");
+
+			return "houses/show";
+		}
+
+		redirectAttributes.addFlashAttribute("reservationInputForm", reservationInputForm);
+
+		return "redirect:/houses/{id}/reservations/confirm";
+	}
+
 	@GetMapping("/houses/{id}/reservations/confirm")
 	public String confirm(
-			@PathVariable(name = "id")Integer id, 
-			@ModelAttribute ReservationInputForm reservationInputForm, 
+			@PathVariable(name = "id") Integer id,
+			@ModelAttribute ReservationInputForm reservationInputForm,
 			@RequestParam(name = "couponCode", required = false) String couponCode,
 			@AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
 			HttpServletRequest httpServletRequest,
 			Model model) {
-		
+
 		House house = houseRepository.getReferenceById(id);
-		
-		User user =userDetailsImpl.getUser();
-		
+
+		User user = userDetailsImpl.getUser();
+
 		//チェックイン日とチェックアウト日を取得する
-		LocalDate checkinDate =reservationInputForm.getCheckinDate();
-		
+		LocalDate checkinDate = reservationInputForm.getCheckinDate();
+
 		LocalDate checkoutDate = reservationInputForm.getCheckoutDate();
-		
+
 		//宿泊料金を計算する
-		Integer price =house.getPrice();
-		
+		Integer price = house.getPrice();
+
 		Coupon coupon = null;
-	    if (couponCode != null && !couponCode.isEmpty()) {
-	        coupon = couponService.verifyAndGetCoupon(couponCode, user);
-	        
-	        if (coupon == null) {
-	            // クーポンが使えない場合（使用済みか無効）はじく
-	            model.addAttribute("couponError", "無効なクーポンコードか、すでに使用されています。");
-	        } else {
-	            // クーポンが有効な場合は、画面に適用中と出すためにモデルに詰める
-	            model.addAttribute("appliedCoupon", coupon);
-	        }
-	    }
-		
-		
-		Integer amount =reservationService.calculateAmount(checkinDate, checkoutDate, price, coupon);
-		
+		if (couponCode != null && !couponCode.isEmpty()) {
+			coupon = couponService.verifyAndGetCoupon(couponCode, user);
+
+			if (coupon == null) {
+				// クーポンが使えない場合（使用済みか無効）はじく
+				model.addAttribute("couponError", "無効なクーポンコードか、すでに使用されています。");
+			} else {
+				// クーポンが有効な場合は、画面に適用中と出すためにモデルに詰める
+				model.addAttribute("appliedCoupon", coupon);
+			}
+		}
+
+		Integer amount = reservationService.calculateAmount(checkinDate, checkoutDate, price, coupon);
+
 		ReservationRegisterForm reservationRegisterForm = new ReservationRegisterForm(
-				house.getId(), 
-				user.getId(), 
-				checkinDate.toString(), 
-				checkoutDate.toString(), 
+				house.getId(),
+				user.getId(),
+				checkinDate.toString(),
+				checkoutDate.toString(),
 				reservationInputForm.getNumberOfPeople(),
 				amount);
-		
-		String sessionId = stripeService.createStripeSession(house.getName(), reservationRegisterForm, httpServletRequest);
-		
+
+		String sessionId = stripeService.createStripeSession(house.getName(), reservationRegisterForm,
+				httpServletRequest);
+
 		model.addAttribute("house", house);
-		
+
 		model.addAttribute("reservationRegisterForm", reservationRegisterForm);
-		
-		 model.addAttribute("sessionId", sessionId);
-		 
-		 model.addAttribute("couponCode", couponCode);
-		
+
+		model.addAttribute("sessionId", sessionId);
+
+		model.addAttribute("couponCode", couponCode);
+
 		return "reservations/confirm";
-		
+
 	}
-	
-//	@PostMapping("houses/{id}/reservations/create")
-//	public String create(@ModelAttribute ReservationRegisterForm reservationRegisterForm) {
-//		
-//		reservationService.create(reservationRegisterForm);
-//		
-//		return "redirect:/reservations?reserved";
-//	}
-		
-	
-	
+
+	//	@PostMapping("houses/{id}/reservations/create")
+	//	public String create(@ModelAttribute ReservationRegisterForm reservationRegisterForm) {
+	//		
+	//		reservationService.create(reservationRegisterForm);
+	//		
+	//		return "redirect:/reservations?reserved";
+	//	}
+
 }
