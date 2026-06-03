@@ -72,7 +72,7 @@ public class AuthController {
 			
 		}
 		
-		userService.create(signupForm);
+		
 		
 		redirectAttributes.addFlashAttribute("successMessage","会員登録が完了しました。");
 		
@@ -82,7 +82,7 @@ public class AuthController {
 		
 		signupEventPublisher.publishSignupEvent(createdUser, requestUrl);
 		
-		redirectAttributes.addFlashAttribute("succesMessage","ご入力いただいたメールアドレスに認証メールを送信しました。メールに記載されているリンクをクリックして会員登録を完了してください");
+		redirectAttributes.addFlashAttribute("successMessage","ご入力いただいたメールアドレスに認証メールを送信しました。メールに記載されているリンクをクリックして会員登録を完了してください");
 		
 		return "redirect:/";
 		

@@ -47,7 +47,7 @@ public class UserService {
 
 		user.setRole(role);
 
-		user.setEnabled(true);
+		user.setEnabled(false);
 
 		return userRepository.save(user);
 
